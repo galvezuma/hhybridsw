@@ -1,6 +1,7 @@
 package hhybridsw;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ public class HHybridSW {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws Exception {
+        long initTime = System.currentTimeMillis();
         Options options = new Options(args);
         if (! options.isHelp()) {
             HashMap<String, LauncherTuple> algorithms = loadExecutions(options);
@@ -27,14 +29,15 @@ public class HHybridSW {
             for(String key: algorithms.keySet()) {
                 LauncherTuple lt = algorithms.get(key);
                 Launcher launcher = (Launcher) lt.launcherClass.newInstance();
-                launcher.setId(key);
+                launcher.setKey(key);
                 launcher.setLine(lt.commandLine);
                 launchers.add(launcher);
+                launcher.start();
             }
             for(Launcher l: launchers)
                 l.join();
-            for(Launcher l: launchers)
-                l.extractData();
+            showResults(launchers, System.out);
+            System.out.printf("Total Execution time: %.3f sec.\n", (System.currentTimeMillis()-initTime)/1000.0);
         }
     }
 
@@ -67,6 +70,12 @@ public class HHybridSW {
         }
         return ret;
     }    
+
+    private static void showResults(List<Launcher> launchers, PrintStream out) {
+        launchers.stream().forEach((l) -> {
+            out.printf("%s \tGigaCUPS: %.3f \tExecution_time: %.3f sec.\n", l.getKey(), l.getGigaCUPS(), l.getTimeTaken());
+        });
+    }
     
     private static class LauncherTuple {
         public Class launcherClass;
