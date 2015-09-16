@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -72,6 +74,13 @@ public class HHybridSW {
     }    
 
     private static void showResults(List<Launcher> launchers, PrintStream out) {
+        Set<HitSet> result = new HashSet<>();
+        launchers.stream().forEach((l) -> {
+            try { HitSet.union(result, l.getHits()); } catch(Exception ex) { ex.printStackTrace(); }
+        });
+        result.stream().forEach((hs) -> {
+            out.println(hs);
+        });
         launchers.stream().forEach((l) -> {
             out.printf("%s \tGigaCUPS: %.3f \tExecution_time: %.3f sec.\n", l.getKey(), l.getGigaCUPS(), l.getTimeTaken());
         });

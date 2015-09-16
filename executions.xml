@@ -3,6 +3,12 @@
     <algorithm id="uno" name="uno" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.CudaSWProcessor" use="yes" >
         cmd.exe /C type d:\cudasw.out 
     </algorithm>
+    <algorithm id="dos" name="uno" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.SwipeProcessor" use="yes" >
+        cmd.exe /C type d:\swipe.out 
+    </algorithm>
+    <algorithm id="tre" name="uno" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.SwaphiProcessor" use="yes" >
+        cmd.exe /C type d:\swaphi.out 
+    </algorithm>
     <algorithm id="cudasw" name="cudasw" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.CudaSWProcessor" use="no" >
         cudasw -mod simt -topscore_num 1000 [-d|-db ] [-i|-query ] [-m|-mat ] [-g|--gapo ] [-e|--gape ]
     </algorithm>

@@ -3,8 +3,9 @@ package hhybridsw;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -15,7 +16,7 @@ abstract public class Launcher extends Thread {
     // This stores the complete output of a program
     protected StringBuffer internalOutput = new StringBuffer();
     protected double gigaCUPS = 0.0;
-    protected List<String> hits = new ArrayList<>();
+    protected Set<HitSet> hits = new HashSet<>();
     private double timeTaken = 0;
     
     private String key;
@@ -53,7 +54,7 @@ abstract public class Launcher extends Thread {
                 appendTointernalOutput(l+"\n");
             }
             in.close();
-            System.out.println(internalOutput);
+            //System.out.println(internalOutput);
             timeTaken = (System.currentTimeMillis() - initTime) / 1000.0;
             extractData();
         } catch (Exception ex) {
@@ -89,7 +90,7 @@ abstract public class Launcher extends Thread {
     /**
      * @return the hits
      */
-    public List<String> getHits() {
+    public Set<HitSet> getHits() {
         return hits;
     }
 

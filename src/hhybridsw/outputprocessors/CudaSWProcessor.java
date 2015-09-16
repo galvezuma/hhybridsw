@@ -1,5 +1,6 @@
 package hhybridsw.outputprocessors;
 
+import hhybridsw.HitSet;
 import hhybridsw.Launcher;
 import java.io.BufferedReader;
 import java.io.StringReader;
@@ -17,26 +18,33 @@ public class CudaSWProcessor extends Launcher {
     }
     
     /**
-     * Shows on console the interesting part of the results of the CUDASW++ execution.
+     * As a result of the CUDASW++ execution on a list of query sequences and a database,
+     * every query sequence produces a HitSet, i.e. a set of hits in the database.
+     * This function inserts into a set of Hitsets all the hits found by the algorithm.
+     * The data comes from the output of the algorithm execution.
      * @throws java.lang.Exception
      */
     @Override
     public void extractData() throws Exception {
         BufferedReader in = new BufferedReader(new StringReader(internalOutput.toString()));
         String l;
-        boolean lookingGCUPS = true;
-        boolean readingHits = false;
+        HitSet hs = null;
         while ((l = in.readLine()) != null) {
-            if (lookingGCUPS && l.contains("GCUPS:")) {
-                gigaCUPS = Double.parseDouble(l.substring(l.lastIndexOf("GCUPS:")+6));
-                lookingGCUPS = false;
-                readingHits = true;
+            if (l.contains("query:")) {
+                if (hs != null) hits.add(hs);
+                String name = l.substring(6); // We read the name of the query
+                l = in.readLine();
+                // We take the gigaCUPS as a number, just in case.
+                double gigaCUPS = Double.parseDouble(l.substring(l.lastIndexOf("GCUPS:")+6));
+                // A new HitSet is created
+                hs = new HitSet(name, ""+gigaCUPS);
                 continue;
             }
-            if (readingHits && l.startsWith("score:")) {
-                getHits().add(l.substring(l.lastIndexOf("--")+2));
+            if (l.startsWith("score:")) {
+                hs.getTargetSet().add(l.substring(l.lastIndexOf("--")+2));
             }
         }
+        hits.add(hs);
         in.close();
     }
     
