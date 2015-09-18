@@ -13,9 +13,13 @@ public class HitSet {
     private final HashSet<String> targetSet;
     private String gigaCUPS;
     
-    public HitSet(String query, String gigaCUPS){
+    public HitSet(String query){
         this.query = query;
         this.targetSet = new HashSet<>();
+    }
+    
+    public HitSet(String query, String gigaCUPS){
+        this(query);
         this.gigaCUPS = gigaCUPS;
     }
 
@@ -51,6 +55,10 @@ public class HitSet {
 
     public HashSet<String> getTargetSet() {
         return targetSet;
+    }
+
+    public void setGigaCups(String s) {
+        this.gigaCUPS = s;
     }
     
     public void union(HitSet h) throws Exception {
