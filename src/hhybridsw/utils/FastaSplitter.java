@@ -12,12 +12,16 @@ import java.util.PriorityQueue;
 import java.util.stream.Stream;
 import static java.lang.System.err;
 import static java.lang.System.out;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class FastaSplitter {
 
     private static enum Status {START, READING_PROTEIN, END}
     private static Status currentStatus = Status.START;
-    private static PriorityQueue<Protein> result = new PriorityQueue<>();
+    //private static PriorityQueue<Protein> result = new PriorityQueue<>();
+    private static List<Protein> result = new ArrayList<>();
     private static int numAminoAcids = 0;
     private static Protein currentProtein = null;
     private static class Protein implements Comparable {
@@ -46,11 +50,14 @@ public class FastaSplitter {
         } catch (Exception e) { e.printStackTrace(); }
         currentStatus = Status.END;
         processLine(null);
-        //outputOrdered();
-        outputSplitted(2, 43, 100);
+        //outputOrdered(result);
+        outputSplitted(1, 43, 100);
     }
     
-    private static void outputOrdered() throws IOException {
+    /*
+    * It destroys the result
+    */
+    private static void outputOrdered(PriorityQueue<Protein> result) throws IOException {
         try (PrintWriter output = new PrintWriter(new BufferedWriter(new FileWriter(FILEPATH+File.separatorChar+FILENAME+".sal")))){
             output.println(result.size());
             /* Esto noproduce el resultado ordenado 
@@ -63,10 +70,11 @@ public class FastaSplitter {
     
     private static void outputSplitted(Integer ... pct) throws IOException {
         int aminoAcidsWritten = 0;
+        Iterator<Protein> it = result.iterator();
         for(int i=0; i<pct.length; i++){
             try (PrintWriter output = new PrintWriter(new BufferedWriter(new FileWriter(FILEPATH+File.separatorChar+FILENAME+"_"+i+".sal")))){
                 do {
-                    Protein p = result.remove();
+                    Protein p = it.next();
                     output.printf("%s\n%s\n", p.name, p.aminoacids);
                     aminoAcidsWritten += p.length;
                 } while(pct[i] > (long)aminoAcidsWritten*100/numAminoAcids);

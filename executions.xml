@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
-    <algorithm id="uno" name="uno" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.CudaSWProcessor" use="yes" >
+    <algorithm id="unus" name="primus" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.CudaSWProcessor" use="no" >
         cmd.exe /C type d:\cudasw.out 
     </algorithm>
-    <algorithm id="dos" name="uno" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.SwipeProcessor" use="yes" >
+    <algorithm id="duo" name="secundus" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.SwipeProcessor" use="no" >
         cmd.exe /C type d:\swipe.out 
     </algorithm>
-    <algorithm id="tre" name="uno" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.SwaphiProcessor" use="yes" >
+    <algorithm id="tres" name="tertius" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.SwaphiProcessor" use="no" >
         cmd.exe /C type d:\swaphi.out 
     </algorithm>
-    <algorithm id="cudasw" name="cudasw" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.CudaSWProcessor" use="no" >
-        cudasw -mod simt -topscore_num 1000 [-d|-db ] [-i|-query ] [-m|-mat ] [-g|--gapo ] [-e|--gape ]
+    <algorithm id="cudasw" name="cudasw" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.CudaSWProcessor" use="yes" >
+        cudasw -mod simt -topscore_num 1000 [-d|-db ] [-i|-query ] [-m|-mat ] [-g|-gapo ] [-e|-gape ]
     </algorithm>
-    <algorithm id="swipe" name="mpiswipe" path="/mnt/usb2/swipe-2.0.5/" launcherClass="hhybridsw.outputprocessors.SwipeProcessor" use="no" >
+    <algorithm id="swipe" name="mpiswipe" path="/mnt/usb2/swipe-2.0.5/" launcherClass="hhybridsw.outputprocessors.SwipeProcessor" use="yes" >
         mpirun --allow-run-as-root mpiswipe --num_threads=4 [-d|--db=] [-i|--query=] [-m|--matrix=] [-p|--penalty=] [-r|--reward=] [-g|--gapopen=] [-e|--gapextend=]
     </algorithm>
-    <algorithm id="swaphi" name="swaphi" path="/mnt/usb2/swaphi/" launcherClass="hhybridsw.outputprocessors.SwaphiProcessor" use="no" >
+    <algorithm id="swaphi" name="swaphi" path="/mnt/usb2/swaphi/" launcherClass="hhybridsw.outputprocessors.SwaphiProcessor" use="yes" >
         swaphi align -k 1000 -x 1 -t 228 -p 0 [-i|-q ] [-d|-d ] [-m|-m ] [-g|-g ] [-e|-e ] 
     </algorithm>
 </root>

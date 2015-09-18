@@ -1,0 +1,32 @@
+Executions permite especificar varios algoritmos, uno 
+por etiqueta algorithm. Cada etiqueta se identifica por un código en lugar de por el nombre delalgoritmo, 
+lo que permite lanzar elmismo algoritmo varias veces (p.ej. contra distintas tarjetas
+gráficas nstaladas en elmismo equipo). Para cada algoritmo hay que especificar 
+dónde está el ejecutable y el nombre de éste. Cualquier variable de entorno ha debido ser configurada previamente
+para que los lanzamientos de cada algoritmo funcionen bien.
+Para facilitar el equilibrado de HHybrid, es posible 
+indicar que un algoritmo no se ejecute temporalmente (lo que evita tener que comentar o eliminar bloques completos de executions.xml).
+Cada algoritmo tiene una línea que contiene los parámetos de HHybridSW y el correspondiente
+çen el algoritmo en particular. Al ejecutarse todo se hace una sustitución. En esta versión
+todos los algoritmos toman el mismo nombre de fichero database y query, aunque realmente puede considerarse que 
+lo común es elprefijo en dichos nombres ya que cada algoritmo puede incluir un sufijo en 
+la línea de ekjecución p.ej. poner [-d|--db=]sufijo en lugar de [-d|--db=].
+
+Una jerarquí de Launchers ejecuta cada uno de los algoritmos y extrae la salida estándar
+y la de error. Luego se filtra y los hits de cada secuencia query se fusionan en
+una sola secuencia de hits que se emite por pantalla. También se extraen los GigaCUPs
+que cada algoritmo ha alcanzado para cada secuencia y se emiten por pantalla.
+
+en nuestro caso, el problema que aparece es que cada algoritmo requiere la base de
+datos en un formato determinado: CUDASW en fasta puro mientras que Swipe en BLAST y Swaphi usa un formato propio.
+Las tres bases de datos pueden empezar por el mismo prefijo (nombre) ya que los ficheros
+en sí usan extensiones distintas y, por ello, no hay conflicto en los nombre finales completos
+de los ficheros.
+
+La partición delos ficheros puede hacerse forma ordenada (por longitud) o no, dependiendo de lo que
+más interese (el proceso de Swaphi para crear la base de datos vuelve a ordenar las secuencias por longitud).
+Así, se crean ficheros son extensiones 1, 2, 3 etc. cuyo tamaño (medida en bases y no
+de forma brutal, i.e. no se inclute el texto de los gi de las secuencias) coincide con el
+porcentaje incremental especificado. P.ej. 10, 50, 100 crearía particiones cuyo amaño aproximado sería del 10%, 40%
+y 50% del original; lo normal es que el último número siempre sea 100.
+
