@@ -17,6 +17,15 @@ y la de error. Luego se filtra y los hits de cada secuencia query se fusionan en
 una sola secuencia de hits que se emite por pantalla. También se extraen los GigaCUPs
 que cada algoritmo ha alcanzado para cada secuencia y se emiten por pantalla.
 
+Si se quiere meter un nuevo algoritmo, lo que hay que hacer es crear una nueva clase
+que hereda de launcher para que extraiga los Hits del resultado que dicho algoritmo emita por pantalla.
+Un HitSet contiene el gi, la lista de strings o gis de la base de datos con los
+que el alineamiento tiene sentido y los gigaCUPS alcanzados por el algoritmo para 
+encontrar los hits de esa query en particular.
+
+Aquí no se saca el alineamiento final, aunque Swipe lo hace, ya que nos hemos decantado 
+por extraer el mínimo común a todos los algoritmos.
+
 en nuestro caso, el problema que aparece es que cada algoritmo requiere la base de
 datos en un formato determinado: CUDASW en fasta puro mientras que Swipe en BLAST y Swaphi usa un formato propio.
 Las tres bases de datos pueden empezar por el mismo prefijo (nombre) ya que los ficheros
@@ -29,4 +38,16 @@ Así, se crean ficheros son extensiones 1, 2, 3 etc. cuyo tamaño (medida en bas
 de forma brutal, i.e. no se inclute el texto de los gi de las secuencias) coincide con el
 porcentaje incremental especificado. P.ej. 10, 50, 100 crearía particiones cuyo amaño aproximado sería del 10%, 40%
 y 50% del original; lo normal es que el último número siempre sea 100.
+
+Un script como:
+mv uniprot_sprot.fasta_2.sal uniprot_sprot.fasta
+swaphi index -x 1 -d uniprot_sprot.fasta
+rm -y uniprot_sprot.fasta
+mv uniprot_sprot.fasta_1.sal uniprot_sprot.fasta
+makeblastdb -database uniprot_sprot.fasta
+rm -y uniprot_sprot.fasta
+mv uniprot_sprot.fasta_0.sal uniprot_sprot.fasta
+se encarga de pasar cada partición al formato que sea.
+Nótese que la última tiene cmo nombre el prefijo de las demás y, por tanto,
+debe ser la última para que no se machaque con los mv.
 

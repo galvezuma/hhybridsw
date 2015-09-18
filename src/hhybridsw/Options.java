@@ -20,6 +20,10 @@ class Options {
         takeOptions(args);
         if ((getHelp() != null && getHelp().equals(Boolean.TRUE.toString())) || ! validate()){
             showHelp();
+            // If we have entered in this if because of ! validate has shown an error
+            // then we have to set 'h' to ERROR to avoid continuing the execution
+            if (getHelp() == null) 
+                opt.replace('h', "ERROR");
         }
     }
     
