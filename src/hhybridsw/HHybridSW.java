@@ -1,5 +1,6 @@
 package hhybridsw;
 
+import hhybridsw.utils.FastaSplitter;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -28,22 +29,37 @@ public class HHybridSW {
         if (! options.isHelp()) {
             HashMap<String, LauncherTuple> algorithms = loadExecutions(options);
             List<Launcher> launchers = new ArrayList<>();
-            for(String key: algorithms.keySet()) {
-                LauncherTuple lt = algorithms.get(key);
-                Launcher launcher = (Launcher) lt.launcherClass.newInstance();
-                launcher.setKey(key);
-                launcher.setLine(lt.commandLine);
-                launchers.add(launcher);
-                launcher.start();
+            // Check if the split option is activated
+            if (options.getSplitDatabase() != -1){
+                Double pcts[] = new Double[algorithms.size()];
+                int idx=0;
+                double accumulated = 0.0;
+                for (LauncherTuple lt: algorithms.values())
+                    pcts[idx++] = (accumulated += lt.splitPercentage);
+                FastaSplitter.process(options.getDatabase(), pcts);
             }
-            for(Launcher l: launchers)
-                l.join();
+            // Load and execute the launchers and show the results
+            prepareExecuteAndWaitLaunchers(algorithms, launchers);
             showResults(launchers, System.out);
             System.out.printf("Total Execution time: %.3f sec.\n", (System.currentTimeMillis()-initTime)/1000.0);
         }
     }
 
+    private static void prepareExecuteAndWaitLaunchers(HashMap<String, LauncherTuple> algorithms, List<Launcher> launchers) throws Exception {
+        for(String key: algorithms.keySet()) {
+            LauncherTuple lt = algorithms.get(key);
+            Launcher launcher = (Launcher) lt.launcherClass.newInstance();
+            launcher.setKey(key);
+            launcher.setLine(lt.commandLine);
+            launchers.add(launcher);
+            launcher.start();
+        }
+        for(Launcher l: launchers)
+            l.join();
+    }
+
     private static HashMap<String, LauncherTuple> loadExecutions(Options options) throws Exception  {
+        Double totalPct = 0.0;
         HashMap<String, LauncherTuple> ret = new HashMap<>();
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File("./executions.xml"));
         doc.getDocumentElement().normalize();
@@ -53,11 +69,12 @@ public class HHybridSW {
             if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element eElement = (Element) nNode;
                 String use = eElement.getAttribute("use");
-                if (use.toLowerCase().equals("yes")) {
+                if (use == null || use.toLowerCase().equals("yes")) {
                     String id = eElement.getAttribute("id");
                     String name = eElement.getAttribute("name");
                     String path = eElement.getAttribute("path");
                     String lc = eElement.getAttribute("launcherClass");
+                    String pct = eElement.getAttribute("pct");
                     String executionLine = eElement.getTextContent();
                     // This adds the path to the program name (id) and removes blank lines and spaces
                     executionLine = executionLine.replaceFirst(name, path+name).replaceAll("\\n|\\r", "").replaceFirst(" *", "");
@@ -66,10 +83,20 @@ public class HHybridSW {
                     LauncherTuple lt = new LauncherTuple();
                     lt.commandLine = executionLine;
                     lt.launcherClass = Class.forName(lc);
+                    lt.splitPercentage = -1;
                     ret.put(id, lt);
+                    // Check if the split option is activated
+                    if (options.getSplitDatabase() != -1){
+                        if (pct == null) throw new Exception(id + " algorithm must contain a percentage");
+                        lt.splitPercentage = Double.parseDouble(pct);
+                        totalPct += lt.splitPercentage;
+                    }
                 }
             }
         }
+        // Check if the split option percentages sum 100%
+        if (options.getSplitDatabase() != -1 && totalPct != 100.0)
+            throw new Exception("The sum of percentages should be 100%: "+totalPct+"%");
         return ret;
     }    
 
@@ -89,6 +116,7 @@ public class HHybridSW {
     private static class LauncherTuple {
         public Class launcherClass;
         public String commandLine;
+        public double splitPercentage;
     }
     
 }

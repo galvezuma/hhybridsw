@@ -19,7 +19,7 @@ abstract public class Launcher extends Thread {
     protected Set<HitSet> hits = new HashSet<>();
     private double timeTaken = 0;
     
-    private String key;
+    protected String key;
     private String line;
 
     /**

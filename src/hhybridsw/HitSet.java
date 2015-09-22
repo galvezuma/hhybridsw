@@ -72,7 +72,7 @@ public class HitSet {
     
     @Override
     public String toString(){
-        String ret = query + "\n";
+        String ret = query + "\n" + gigaCUPS + "\n";
         for(String s: targetSet)
             ret += s + "\n";
         return ret;

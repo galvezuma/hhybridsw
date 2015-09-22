@@ -34,7 +34,7 @@ public class SwaphiProcessor extends Launcher {
             if (l.startsWith("Runtime:")) {
                 l = removeLastWord(l);
                 l = takeLastWord(l);
-                hs.setGigaCups(""+Double.parseDouble(l));
+                hs.setGigaCups(key+": "+Double.parseDouble(l));
                 hits.add(hs);
             } else if (l.startsWith("score")) {
                 int initIndex = l.indexOf(" ", 8)+1;

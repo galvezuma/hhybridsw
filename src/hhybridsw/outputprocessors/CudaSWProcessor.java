@@ -37,7 +37,7 @@ public class CudaSWProcessor extends Launcher {
                 // We take the gigaCUPS as a number, just in case.
                 double gigaCUPS = Double.parseDouble(l.substring(l.lastIndexOf("GCUPS:")+6));
                 // A new HitSet is created
-                hs = new HitSet(name, ""+gigaCUPS);
+                hs = new HitSet(name, key+": "+gigaCUPS);
                 continue;
             }
             if (l.startsWith("score:")) {

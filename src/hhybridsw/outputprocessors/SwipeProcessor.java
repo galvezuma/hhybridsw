@@ -39,7 +39,7 @@ public class SwipeProcessor extends Launcher {
             if (lookingGCUPS && l.startsWith("Speed:")) {
                 double gigaCUPS = Double.parseDouble(l.substring(l.lastIndexOf("Speed:")+6, l.lastIndexOf("GCUPS")-1));
                 // A new HitSet is created
-                hs = new HitSet(name, ""+gigaCUPS);
+                hs = new HitSet(name, key+": "+gigaCUPS);
                 lookingGCUPS = false;
                 lookingHits = true;
                 continue;

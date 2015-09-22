@@ -51,7 +51,22 @@ public class FastaSplitter {
         currentStatus = Status.END;
         processLine(null);
         //outputOrdered(result);
-        outputSplitted(1, 43, 100);
+        outputSplitted(1.0, 43.0, 100.0);
+    }
+
+    public static void process(String database, Double ... pcts) throws Exception {
+        currentStatus = Status.START;
+        Path path = Paths.get(database);
+        //The stream hence file will also be closed here
+        try (Stream<String> lines = Files.lines(path)) {
+            lines.forEach(s -> processLine(s));
+        } catch (Exception e) { e.printStackTrace(); }
+        currentStatus = Status.END;
+        processLine(null);
+        //outputOrdered(result);
+        outputSplitted(pcts);
+            Process process = Runtime.getRuntime().exec("createdatabase.sh");
+            process.waitFor();
     }
     
     /*
@@ -68,7 +83,7 @@ public class FastaSplitter {
         }
     }
     
-    private static void outputSplitted(Integer ... pct) throws IOException {
+    private static void outputSplitted(Double ... pct) throws IOException {
         int aminoAcidsWritten = 0;
         Iterator<Protein> it = result.iterator();
         for(int i=0; i<pct.length; i++){
