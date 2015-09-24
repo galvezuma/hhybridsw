@@ -1,21 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
-    <algorithm id="unus" name="primus" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.CudaSWProcessor" use="no" >
+    <algorithm id="unus" name="primus" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.CudaSWProcessor" use="yes" pct="2" >
+        <execution>
         cmd.exe /C type d:\cudasw.out 
+        </execution>
+        <database>
+            <create>
+        cmd.exe /C type d:\cudasw.out 
+            </create>
+            <destroy>
+        cmd.exe /C del [-d|]_0.out
+            </destroy>
+        </database>
     </algorithm>
-    <algorithm id="duo" name="secundus" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.SwipeProcessor" use="no" >
+    <algorithm id="duo" name="secundus" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.SwipeProcessor" use="yes" pct="41" >
+        <execution>
         cmd.exe /C type d:\swipe.out 
+        </execution>
+        <database>
+            <create>
+        cmd.exe /C type d:\swipe.out 
+            </create>
+            <destroy>
+        cmd.exe /C del [-d|]_1.out
+            </destroy>
+        </database>
     </algorithm>
-    <algorithm id="tres" name="tertius" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.SwaphiProcessor" use="no" >
+    <algorithm id="tres" name="tertius" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.SwaphiProcessor" use="yes" pct="57" >
+        <execution>
         cmd.exe /C type d:\swaphi.out 
+        </execution>
+        <database>
+            <create>
+        cmd.exe /C type d:\swaphi.out 
+            </create>
+            <destroy>
+        cmd.exe /C del [-d|]_2.out
+            </destroy>
+        </database>
     </algorithm>
-    <algorithm id="cudasw" name="cudasw" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.CudaSWProcessor" use="yes" pct="2" >
+    <algorithm id="cudasw" name="cudasw" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.CudaSWProcessor" use="no" pct="2" >
+        <execution>
         cudasw -mod simt -topscore_num 1000 [-d|-db ] [-i|-query ] [-m|-mat ] [-g|-gapo ] [-e|-gape ]
+        </execution>
+        <database>
+            <create>
+                cmd.exe /C echo
+            </create>
+            <destroy>
+                rm [-d|]_0.out*
+            </destroy>
+        </database>
     </algorithm>
-    <algorithm id="swipe" name="mpiswipe" path="/mnt/usb2/swipe-2.0.5/" launcherClass="hhybridsw.outputprocessors.SwipeProcessor" use="yes" pct="41" >
+    <algorithm id="swipe" name="mpiswipe" path="/mnt/usb2/swipe-2.0.5/" launcherClass="hhybridsw.outputprocessors.SwipeProcessor" use="no" pct="41" >
+        <execution>
         mpirun --allow-run-as-root mpiswipe --num_threads=4 [-d|--db=] [-i|--query=] [-m|--matrix=] [-p|--penalty=] [-r|--reward=] [-g|--gapopen=] [-e|--gapextend=]
+        </execution>
+        <database>
+            <create>
+                makeblastdb [-d|]_1.out
+            </create>
+            <destroy>
+                rm [-d|]_1.out*
+            </destroy>
+        </database>
     </algorithm>
-    <algorithm id="swaphi" name="swaphi" path="/mnt/usb2/swaphi/" launcherClass="hhybridsw.outputprocessors.SwaphiProcessor" use="yes" pct="57" >
+    <algorithm id="swaphi" name="swaphi" path="/mnt/usb2/swaphi/" launcherClass="hhybridsw.outputprocessors.SwaphiProcessor" use="no" pct="57" >
+        <execution>
         swaphi align -k 1000 -x 1 -t 228 -p 0 [-i|-q ] [-d|-d ] [-m|-m ] [-g|-g ] [-e|-e ] 
+        </execution>
+        <database>
+            <create>
+                swaphi index -x 1 -t 228 [-d|]_2.out
+            </create>
+            <destroy>
+                rm [-d|]_2.out*
+            </destroy>
+        </database>
     </algorithm>
 </root>

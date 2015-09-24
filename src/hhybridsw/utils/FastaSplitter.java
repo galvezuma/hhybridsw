@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import static java.lang.System.err;
 import static java.lang.System.out;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -51,10 +52,31 @@ public class FastaSplitter {
         currentStatus = Status.END;
         processLine(null);
         //outputOrdered(result);
-        outputSplitted(1.0, 43.0, 100.0);
+        outputSplitted(FILEPATH+File.separator+FILENAME, 1.0, 43.0, 100.0);
     }
 
-    public static void process(String database, Double ... pcts) throws Exception {
+    public static void process(String database, Collection<AlgorithmTuple> values) throws Exception {
+        Process process;
+        // Removes any previous database
+        for (AlgorithmTuple lt: values) {
+            process = Runtime.getRuntime().exec(lt.databaseDestroyCommandLine);
+            process.waitFor();
+        }
+        // Prepare percentages to split the database
+        Double pcts[] = new Double[values.size()];
+        int idx=0;
+        double accumulated = 0.0;
+        for (AlgorithmTuple lt: values)
+            pcts[idx++] = (accumulated += lt.splitPercentage);
+        FastaSplitter.split(database, pcts);
+        // Creates databases 
+        for (AlgorithmTuple lt: values) {
+            process = Runtime.getRuntime().exec(lt.databaseCreateCommandLine);
+            process.waitFor();
+        }
+    }
+
+    public static void split(String database, Double ... pcts) throws Exception {
         currentStatus = Status.START;
         Path path = Paths.get(database);
         //The stream hence file will also be closed here
@@ -64,9 +86,7 @@ public class FastaSplitter {
         currentStatus = Status.END;
         processLine(null);
         //outputOrdered(result);
-        outputSplitted(pcts);
-            Process process = Runtime.getRuntime().exec("createdatabase.sh");
-            process.waitFor();
+        outputSplitted(database, pcts);
     }
     
     /*
@@ -83,25 +103,25 @@ public class FastaSplitter {
         }
     }
     
-    private static void outputSplitted(Double ... pct) throws IOException {
-        int aminoAcidsWritten = 0;
+    private static void outputSplitted(String database, Double ... pct) throws IOException {
+        long aminoAcidsWritten = 0;
         Iterator<Protein> it = result.iterator();
         for(int i=0; i<pct.length; i++){
-            try (PrintWriter output = new PrintWriter(new BufferedWriter(new FileWriter(FILEPATH+File.separatorChar+FILENAME+"_"+i+".sal")))){
+            try (PrintWriter output = new PrintWriter(new BufferedWriter(new FileWriter(database+"_"+i+".out")))){
                 do {
                     Protein p = it.next();
                     output.printf("%s\n%s\n", p.name, p.aminoacids);
                     aminoAcidsWritten += p.length;
-                } while(pct[i] > (long)aminoAcidsWritten*100/numAminoAcids);
-                out.println("Written: "+aminoAcidsWritten+" from "+numAminoAcids+"(Pct: "+((long)aminoAcidsWritten*100/numAminoAcids)+"%)"+pct[i]);
+                } while((pct[i] > (double)aminoAcidsWritten*100/numAminoAcids));
+                out.println("Written: "+aminoAcidsWritten+" from "+numAminoAcids+" (Pct: "+((double)aminoAcidsWritten*100/numAminoAcids)+"%) "+pct[i]);
             }
         }
     }
     
     private static int currentLine = 0;
     private static void processLine(String s) {
-        if ((++currentLine % 1000) == 0)
-            out.println(currentLine);
+        //if ((++currentLine % 1000) == 0)
+        //    out.println(currentLine);
         if (currentStatus == Status.START){
             if (s.startsWith(">")){
                 currentProtein = new Protein();
@@ -126,7 +146,6 @@ public class FastaSplitter {
             if (currentProtein != null){
                 if (s.startsWith(">")){
                     currentProtein.length = currentProtein.aminoacids.length();
-                    result.add(currentProtein);
                     result.add(currentProtein);
                     numAminoAcids += currentProtein.length;
                     currentProtein = new Protein();
