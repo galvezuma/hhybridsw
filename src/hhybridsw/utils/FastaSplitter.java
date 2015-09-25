@@ -1,3 +1,11 @@
+/*
+ *  Esta clase sirve para particionar un gran fichero fasta en varios.
+ * Se emplea con dos propósitos:
+ * 1) Para usarla desde el programa principal con objeto de particionar la base
+ *    de datos en los bloques necesarios para cada algoritmo.
+ * 2) Para trocear una base de datos conocida con objeto de crear ficheros de
+ *    prueba.
+ */
 package hhybridsw.utils;
 
 import java.io.BufferedWriter;
@@ -16,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class FastaSplitter {
 
@@ -38,21 +47,42 @@ public class FastaSplitter {
             return length+"\n"+name+"\n"+aminoacids;
         }
     }
-
+    /*
+    Release 2015_09 of 16-Sep-2015 of UniProtKB/TrEMBL contains 50825784 sequence entries,
+    comprising 16880602444 amino acids.
+    */
     private static final String FILENAME = "uniprot_sprot.fasta";
     private static final String FILEPATH = "D:\\swiss_prot";
+    private static final long NUM_AMINOACIDS = 16_880_602_444L;
+    private static long aminoAcidsWritten = -1;
 
+    
     public static void main(String[] args) throws Exception {
+        main_little(args);
+    }
+    public static void main_big(String[] args) throws Exception {
+        currentStatus = Status.START;
+        Path path = Paths.get(FILEPATH, FILENAME);
+        //The stream hence file will also be closed here
+        setSizeFiles(1.0, 2.5, 3.0);
+        try (Stream<String> lines = Files.lines(path)) {
+            lines.forEach(s -> processLine(s, p -> saveToFile(p)));
+        } catch (Exception e) { e.printStackTrace(); }
+        currentStatus = Status.END;
+        processLine(null, p -> saveToFile(p));
+    }
+    
+    public static void main_little(String[] args) throws Exception {
         currentStatus = Status.START;
         Path path = Paths.get(FILEPATH, FILENAME);
         //The stream hence file will also be closed here
         try (Stream<String> lines = Files.lines(path)) {
-            lines.forEach(s -> processLine(s));
+            lines.forEach(s -> processLine(s, p -> addToResult(p)));
         } catch (Exception e) { e.printStackTrace(); }
         currentStatus = Status.END;
-        processLine(null);
+        processLine(null, p -> addToResult(p));
         //outputOrdered(result);
-        outputSplitted(FILEPATH+File.separator+FILENAME, 1.0, 43.0, 100.0);
+        outputSplitted(FILEPATH+File.separator+FILENAME, 19.0, 43.0, 100.0);
     }
 
     public static void process(String database, Collection<AlgorithmTuple> values) throws Exception {
@@ -68,6 +98,7 @@ public class FastaSplitter {
         double accumulated = 0.0;
         for (AlgorithmTuple lt: values)
             pcts[idx++] = (accumulated += lt.splitPercentage);
+        // Splits the database
         FastaSplitter.split(database, pcts);
         // Creates databases 
         for (AlgorithmTuple lt: values) {
@@ -81,10 +112,10 @@ public class FastaSplitter {
         Path path = Paths.get(database);
         //The stream hence file will also be closed here
         try (Stream<String> lines = Files.lines(path)) {
-            lines.forEach(s -> processLine(s));
+            lines.forEach(s -> processLine(s, p -> addToResult(p)));
         } catch (Exception e) { e.printStackTrace(); }
         currentStatus = Status.END;
-        processLine(null);
+        processLine(null, p -> addToResult(p));
         //outputOrdered(result);
         outputSplitted(database, pcts);
     }
@@ -104,13 +135,13 @@ public class FastaSplitter {
     }
     
     private static void outputSplitted(String database, Double ... pct) throws IOException {
-        long aminoAcidsWritten = 0;
+        aminoAcidsWritten = 0;
         Iterator<Protein> it = result.iterator();
         for(int i=0; i<pct.length; i++){
             try (PrintWriter output = new PrintWriter(new BufferedWriter(new FileWriter(database+"_"+i+".out")))){
                 do {
                     Protein p = it.next();
-                    output.printf("%s\n%s\n", p.name, p.aminoacids);
+                    output.printf("%s\n%s", p.name, p.aminoacids);
                     aminoAcidsWritten += p.length;
                 } while((pct[i] > (double)aminoAcidsWritten*100/numAminoAcids));
                 out.println("Written: "+aminoAcidsWritten+" from "+numAminoAcids+" (Pct: "+((double)aminoAcidsWritten*100/numAminoAcids)+"%) "+pct[i]);
@@ -119,13 +150,14 @@ public class FastaSplitter {
     }
     
     private static int currentLine = 0;
-    private static void processLine(String s) {
-        //if ((++currentLine % 1000) == 0)
-        //    out.println(currentLine);
+    private static void processLine(String s, Consumer<Protein> cons) {
+        if ((++currentLine % 1000) == 0)
+            out.println(currentLine);
         if (currentStatus == Status.START){
             if (s.startsWith(">")){
                 currentProtein = new Protein();
                 currentProtein.name = s;
+                currentProtein.length = 0;
                 currentStatus = Status.READING_PROTEIN;
             } else {
                 err.println("Invalid file format. It should start with >.");
@@ -134,9 +166,8 @@ public class FastaSplitter {
         } else if (currentStatus == Status.END) {
             currentLine = 0;
             if (currentProtein != null){
-                currentProtein.length = currentProtein.aminoacids.length();
-                result.add(currentProtein);
                 numAminoAcids += currentProtein.length;
+                cons.accept(currentProtein);
                 currentProtein = null;
             } else {
                 err.println("Empty file.");
@@ -145,13 +176,14 @@ public class FastaSplitter {
         } else { // if (currentStatus == Status.READING_PROTEIN){
             if (currentProtein != null){
                 if (s.startsWith(">")){
-                    currentProtein.length = currentProtein.aminoacids.length();
-                    result.add(currentProtein);
                     numAminoAcids += currentProtein.length;
+                    cons.accept(currentProtein);
                     currentProtein = new Protein();
                     currentProtein.name = s;
+                    currentProtein.length = 0;
                 } else {
-                    currentProtein.aminoacids.append(s);
+                    currentProtein.length += s.length();
+                    currentProtein.aminoacids.append(s).append("\n");
                 }
             } else {
                 err.println("Unexpected error. Current protein is null.");
@@ -159,6 +191,46 @@ public class FastaSplitter {
             }
         }
     }
+    
+    // This adds proteins to a Collection to allow writing them ordered.
+    private static void addToResult(Protein p){
+        result.add(p);
+    }
 
+    /*
+    * This adds the proteins to a file as soon as they are taken from input file.
+    */
+    private static double[] pcts = null;
+    private static int fileIdx = -1;
+    private static PrintWriter bigFile = null;
+    private static void setSizeFiles(double ... p) throws IOException {
+        pcts = p;
+        fileIdx = 0;
+        aminoAcidsWritten = 0;
+        bigFile = new PrintWriter(new BufferedWriter(new FileWriter(FILEPATH+File.separatorChar+FILENAME+"_"+fileIdx+".out")));
+    }
+    
+    private static void saveToFile(Protein p) {
+        if (bigFile == null) {
+            System.out.println("Probably not 100% has been requested. Current file is null.");
+            System.exit(1);
+        }
+        bigFile.printf("%s\n%s", p.name, p.aminoacids);
+        aminoAcidsWritten += p.length;
+        if ((double)aminoAcidsWritten*100/NUM_AMINOACIDS > pcts[fileIdx]) { // Check if we have to change file
+            bigFile.close();
+            System.out.println("File "+fileIdx+" has been created.");
+            fileIdx++;
+            if (fileIdx < pcts.length) {
+                try {
+                    bigFile = new PrintWriter(new BufferedWriter(new FileWriter(FILEPATH+File.separatorChar+FILENAME+"_"+fileIdx+".out")));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            } else {
+                bigFile = null;
+            }
+        }
+    }
 }
 
