@@ -91,6 +91,7 @@ public class FastaSplitter {
         // Removes any previous database
         for (AlgorithmTuple lt: values) {
             process = Runtime.getRuntime().exec(lt.databaseDestroyCommandLine);
+            out.println("Executing: " + lt.databaseDestroyCommandLine);
             process.waitFor();
         }
         // Prepare percentages to split the database
@@ -104,6 +105,7 @@ public class FastaSplitter {
         // Creates databases 
         for (AlgorithmTuple lt: values) {
             process = Runtime.getRuntime().exec(lt.databaseCreateCommandLine);
+            out.println("Executing: " + lt.databaseCreateCommandLine);
             process.waitFor();
         }
     }
@@ -117,7 +119,7 @@ public class FastaSplitter {
         } catch (Exception e) { e.printStackTrace(); }
         currentStatus = Status.END;
         processLine(null, p -> addToResult(p));
-        //outputOrdered(result);
+        // outputOrdered(result);
         outputSplitted(database, pcts);
     }
     
@@ -144,7 +146,7 @@ public class FastaSplitter {
                     Protein p = it.next();
                     output.printf("%s\n%s", p.name, p.aminoacids);
                     aminoAcidsWritten += p.length;
-                } while((pct[i] > (double)aminoAcidsWritten*100/numAminoAcids));
+                } while((pct[i] > (double)aminoAcidsWritten*100/numAminoAcids) && it.hasNext());
                 out.println("Written: "+aminoAcidsWritten+" from "+numAminoAcids+" (Pct: "+((double)aminoAcidsWritten*100/numAminoAcids)+"%) "+pct[i]);
             }
         }
@@ -152,7 +154,7 @@ public class FastaSplitter {
     
     private static int currentLine = 0;
     private static void processLine(String s, Consumer<Protein> cons) {
-        if ((++currentLine % 1000) == 0)
+        if ((++currentLine % 100000) == 0)
             out.println(currentLine);
         if (currentStatus == Status.START){
             if (s.startsWith(">")){

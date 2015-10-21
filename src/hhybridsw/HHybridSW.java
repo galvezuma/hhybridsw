@@ -106,9 +106,9 @@ public class HHybridSW {
                     String destroyLine = ((Element)eElement.getElementsByTagName("database").item(0)).getElementsByTagName("destroy").item(0).getTextContent();
                     destroyLine = destroyLine.replaceAll("\\n|\\r", "").replaceFirst(" *", "");
                     destroyLine = options.replaceLetters(destroyLine);
-                    System.out.println(createLine);
-                    System.out.println(destroyLine);
-                    System.out.println(executionLine);
+                    // System.out.println(createLine);
+                    // System.out.println(destroyLine);
+                    // System.out.println(executionLine);
                     // -----
                     AlgorithmTuple lt = new AlgorithmTuple();
                     lt.commandLine = executionLine;
