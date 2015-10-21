@@ -11,14 +11,15 @@ import java.util.Set;
 public class HitSet {
     private String query;
     private final HashSet<String> targetSet;
-    private String gigaCUPS;
+    private double gigaCUPS = 0.0;
+    private double time = 0.0;
     
     public HitSet(String query){
         this.query = query;
         this.targetSet = new HashSet<>();
     }
     
-    public HitSet(String query, String gigaCUPS){
+    public HitSet(String query, double gigaCUPS){
         this(query);
         this.gigaCUPS = gigaCUPS;
     }
@@ -57,8 +58,20 @@ public class HitSet {
         return targetSet;
     }
 
-    public void setGigaCups(String s) {
+    public void setGigaCups(double s) {
         this.gigaCUPS = s;
+    }
+    
+    public double getGigaCups(){
+        return this.gigaCUPS;
+    }
+    
+    public double getTime() {
+        return time;
+    }
+
+    public void setTime(double time) {
+        this.time = time;
     }
     
     public void union(HitSet h) throws Exception {
@@ -67,12 +80,14 @@ public class HitSet {
         if (h.query.length() > query.length())
             query = h.query;
         targetSet.addAll(h.targetSet);
-        gigaCUPS += " " + h.gigaCUPS;
+        double tempGCUP = (gigaCUPS * time) + (h.gigaCUPS * h.time);
+        time = Double.max(time, h.time);
+        gigaCUPS = tempGCUP / time;
     }
     
     @Override
     public String toString(){
-        String ret = query + "\n" + gigaCUPS + "\n";
+        String ret = "Query: " + query + "\nGigaCUPS: " + gigaCUPS + "\nTime elapsed: " + time + "\n";
         for(String s: targetSet)
             ret += s + "\n";
         return ret;
@@ -92,7 +107,8 @@ public class HitSet {
                 }
             }
         }
-        // Hitsets contained in b but not in dest are added in the end.
+        // Hitsets contained in b but not in dest are added at the end.
         dest.addAll(b);
     }
+
 }

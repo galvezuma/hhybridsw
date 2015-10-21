@@ -141,7 +141,7 @@ public class HHybridSW {
             out.println(hs);
         });
         launchers.stream().forEach((l) -> {
-            out.printf("%s \tGigaCUPS: %.3f \tExecution_time: %.3f sec.\n", l.getKey(), l.getGigaCUPS(), l.getTimeTaken());
+            out.printf("%s \tGigaCUPS: %.3f \tAlgorithm time: %.3f \tExecution_time: %.3f sec.\n", l.getKey(), l.getGigaCUPS(), l.getTimeAlgorithm(), l.getTimeTaken());
         });
     }
     

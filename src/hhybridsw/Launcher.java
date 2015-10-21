@@ -16,6 +16,7 @@ abstract public class Launcher extends Thread {
     // This stores the complete output of a program
     protected StringBuffer internalOutput = new StringBuffer();
     protected double gigaCUPS = 0.0;
+    private double timeAlgorithm = 0.0;
     protected Set<HitSet> hits = new HashSet<>();
     private double timeTaken = 0;
     
@@ -57,9 +58,23 @@ abstract public class Launcher extends Thread {
             //System.out.println(internalOutput);
             timeTaken = (System.currentTimeMillis() - initTime) / 1000.0;
             extractData();
+            calculateTimeAndCUPS();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+    
+    protected void calculateTimeAndCUPS() {
+        double totalTime = 0.0;
+        double totalGigaCups = 0.0;
+        for(HitSet tempHs: hits){
+            double auxTotal = totalGigaCups * totalTime;
+            double auxPart  = tempHs.getGigaCups() * tempHs.getTime();
+            totalTime += tempHs.getTime();
+            totalGigaCups = (auxTotal + auxPart) / totalTime;
+        }
+        gigaCUPS = totalGigaCups;
+        timeAlgorithm = totalTime;
     }
     
     private synchronized void appendTointernalOutput(String text) {
@@ -80,25 +95,20 @@ abstract public class Launcher extends Thread {
         this.line = line;
     }
 
-    /**
-     * @return the gigaCUPS
-     */
     public double getGigaCUPS() {
         return gigaCUPS;
     }
 
-    /**
-     * @return the hits
-     */
     public Set<HitSet> getHits() {
         return hits;
     }
 
-    /**
-     * @return the timeTaken
-     */
     public double getTimeTaken() {
         return timeTaken;
+    }
+
+    public double getTimeAlgorithm() {
+        return timeAlgorithm;
     }
     
 }

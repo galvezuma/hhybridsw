@@ -1,5 +1,5 @@
 /*
- *  Esta clase sirve para particionar un gran fichero fasta en varios.
+ *  This class is used to partition a big file into several ones.
  * Se emplea con dos propósitos:
  * 1) Para usarla desde el programa principal con objeto de particionar la base
  *    de datos en los bloques necesarios para cada algoritmo.
@@ -51,20 +51,21 @@ public class FastaSplitter {
     Release 2015_09 of 16-Sep-2015 of UniProtKB/TrEMBL contains 50825784 sequence entries,
     comprising 16880602444 amino acids.
     */
-    private static final String FILENAME = "uniprot_sprot.fasta";
-    private static final String FILEPATH = "D:\\swiss_prot";
+    private static final String FILENAME = "SRR292176.fasta";
+    private static final String FILEPATH = "D:\\basura\\sratoolkit.2.5.2-win64\\bin";
     private static final long NUM_AMINOACIDS = 16_880_602_444L;
     private static long aminoAcidsWritten = -1;
 
     
     public static void main(String[] args) throws Exception {
-        main_little(args);
+        System.out.println(calculateNumAminoAcids(FILEPATH+File.separator+FILENAME));
+        //main_big(args);
     }
     public static void main_big(String[] args) throws Exception {
         currentStatus = Status.START;
         Path path = Paths.get(FILEPATH, FILENAME);
         //The stream hence file will also be closed here
-        setSizeFiles(1.0, 2.5, 3.0);
+        setSizeFiles(6.25);
         try (Stream<String> lines = Files.lines(path)) {
             lines.forEach(s -> processLine(s, p -> saveToFile(p)));
         } catch (Exception e) { e.printStackTrace(); }
@@ -231,6 +232,23 @@ public class FastaSplitter {
                 bigFile = null;
             }
         }
+    }
+    
+    private static long aminoAcidsRead = 0;
+    public static long calculateNumAminoAcids(String database){
+        currentStatus = Status.START;
+        Path path = Paths.get(database);
+        //The stream hence file will also be closed here
+        try (Stream<String> lines = Files.lines(path)) {
+            lines.forEach(s -> processLine(s, p -> sumAminoAcids(p)));
+        } catch (Exception e) { e.printStackTrace(); }
+        currentStatus = Status.END;
+        processLine(null, p -> sumAminoAcids(p));
+        return aminoAcidsRead;
+    }
+
+    private static void sumAminoAcids(Protein p) {
+        aminoAcidsRead += p.length;
     }
 }
 

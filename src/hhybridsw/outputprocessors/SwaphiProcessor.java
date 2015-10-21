@@ -24,7 +24,7 @@ public class SwaphiProcessor extends Launcher {
     @Override
     public void extractData() throws Exception {
         BufferedReader in = new BufferedReader(new StringReader(internalOutput.toString()));
-        String l, name = "";
+        String l, l2, name = "";
         HitSet hs = null;
         while ((l = in.readLine()) != null) {
             if (l.startsWith("Query")) {
@@ -32,9 +32,14 @@ public class SwaphiProcessor extends Launcher {
                 hs = new HitSet(name);
             }
             if (l.startsWith("Runtime:")) {
-                l = removeLastWord(l);
-                l = takeLastWord(l);
-                hs.setGigaCups(key+": "+Double.parseDouble(l));
+                // Runtime: 2.985968 seconds 37.977636 GCUPS
+                l2 = removeLastWord(l);
+                l = takeLastWord(l2);
+                hs.setGigaCups(Double.parseDouble(l));
+                l2 = removeLastWord(l2);
+                l2 = removeLastWord(l2);
+                l = takeLastWord(l2);
+                hs.setTime(Double.parseDouble(l));
                 hits.add(hs);
             } else if (l.startsWith("score")) {
                 int initIndex = l.indexOf(" ", 8)+1;
@@ -53,6 +58,7 @@ public class SwaphiProcessor extends Launcher {
         ret = ret.substring(ret.lastIndexOf(" ")+1);
         return ret;
     }
+
 }
 
 /*

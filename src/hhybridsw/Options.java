@@ -87,14 +87,18 @@ class Options {
         return Integer.parseInt(opt.get('e'));
     }
     
+    public int getThreshold(){
+        return Integer.parseInt(opt.get('t'));
+    }
+    
     public int getSplitDatabase(){
         return Integer.parseInt(opt.get('s'));
     }
 
-    private static final char[] letters = {'h', 'd', 'i', 'm', 'p', 'r', 'g', 'e', 's'};
-    private static final boolean[] mustBeNumber = {false, false, false, false, true, true, true, true, true};
-    private static final boolean[] mustBeNotNull = {false, true, true, false, false, false, false, false, false};
-    private static final String[] defaultValues = {null, null, null, "BLOSUM62", "-3", "1", "11", "1", "-1"};
+    private static final char[] letters = {'h', 'd', 'i', 'm', 'p', 'r', 'g', 'e', 't', 's'};
+    private static final boolean[] mustBeNumber = {false, false, false, false, true, true, true, true, true, true};
+    private static final boolean[] mustBeNotNull = {false, true, true, false, false, false, false, false, false, false};
+    private static final String[] defaultValues = {null, null, null, "BLOSUM62", "-3", "1", "11", "1", "100", "-1"};
     private static final String[] descriptions = {
         "Help",
         "Sequence Database name",
@@ -104,6 +108,7 @@ class Options {
         "Reward for nucleotide match",
         "Gap open penalty",
         "Gap extension penalty",
+        "Threshold value for hits",
         "Split the database using several iterations"
     };
     

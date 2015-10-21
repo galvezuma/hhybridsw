@@ -36,8 +36,12 @@ public class CudaSWProcessor extends Launcher {
                 l = in.readLine();
                 // We take the gigaCUPS as a number, just in case.
                 double gigaCUPS = Double.parseDouble(l.substring(l.lastIndexOf("GCUPS:")+6));
+                // We take the time as a number, just in case.
+                // Length: 850 --- time: 349.779 (s) GCUPS: 1.45806
+                double time = Double.parseDouble(l.substring(l.lastIndexOf("time:")+5, l.lastIndexOf("(s)")-1));
                 // A new HitSet is created
-                hs = new HitSet(name, key+": "+gigaCUPS);
+                hs = new HitSet(name, gigaCUPS);
+                hs.setTime(time);
                 continue;
             }
             if (l.startsWith("score:")) {

@@ -36,10 +36,16 @@ public class SwipeProcessor extends Launcher {
                 lookingGCUPS = true;
                 continue;
             }
-            if (lookingGCUPS && l.startsWith("Speed:")) {
+            // Elapsed:           13.97s
+            if (lookingGCUPS && l.startsWith("Elapsed:")) {
+                double time = Double.parseDouble(l.substring(l.lastIndexOf("Elapsed:")+8, l.lastIndexOf("s")-1));
+                // A new HitSet is created
+                l = in.readLine();
+                // Speed:             36.507 GCUPS
                 double gigaCUPS = Double.parseDouble(l.substring(l.lastIndexOf("Speed:")+6, l.lastIndexOf("GCUPS")-1));
                 // A new HitSet is created
-                hs = new HitSet(name, key+": "+gigaCUPS);
+                hs = new HitSet(name, gigaCUPS);
+                hs.setTime(time);
                 lookingGCUPS = false;
                 lookingHits = true;
                 continue;

@@ -41,7 +41,7 @@
     </algorithm>
     <algorithm id="cudasw" name="cudasw" path="/mnt/usb2/cudasw++v2.0.11/" launcherClass="hhybridsw.outputprocessors.CudaSWProcessor" use="no" pct="2" >
         <execution>
-        cudasw -mod simt -topscore_num 1000 [-d|-db ] [-i|-query ] [-m|-mat ] [-g|-gapo ] [-e|-gape ]
+        cudasw -mod simt -topscore_num 1000 [-d|-db ]_0.out [-i|-query ] [-m|-mat ] [-g|-gapo ] [-e|-gape ] [-t|-min_score ]
         </execution>
         <database>
             <create>
@@ -54,7 +54,7 @@
     </algorithm>
     <algorithm id="swipe" name="mpiswipe" path="/mnt/usb2/swipe-2.0.5/" launcherClass="hhybridsw.outputprocessors.SwipeProcessor" use="no" pct="41" >
         <execution>
-        mpirun --allow-run-as-root mpiswipe --num_threads=4 [-d|--db=] [-i|--query=] [-m|--matrix=] [-p|--penalty=] [-r|--reward=] [-g|--gapopen=] [-e|--gapextend=]
+        mpirun -c 7 --allow-run-as-root mpiswipe --num_threads=7 --num_alignments=0 [-d|--db=]_1.out [-i|--query=] [-m|--matrix=] [-p|--penalty=] [-r|--reward=] [-g|--gapopen=] [-e|--gapextend=] [-t|--min_score=]
         </execution>
         <database>
             <create>
@@ -67,7 +67,7 @@
     </algorithm>
     <algorithm id="swaphi" name="swaphi" path="/mnt/usb2/swaphi/" launcherClass="hhybridsw.outputprocessors.SwaphiProcessor" use="no" pct="57" >
         <execution>
-        swaphi align -k 1000 -x 1 -t 228 -p 0 [-i|-q ] [-d|-d ] [-m|-m ] [-g|-g ] [-e|-e ] 
+        swaphi align -k 1000 -x 1 -t 228 -p 0 [-i|-q ] [-d|-d ]_2.out [-m|-m ] [-g|-g ] [-e|-e ]
         </execution>
         <database>
             <create>
