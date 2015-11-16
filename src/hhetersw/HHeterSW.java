@@ -34,15 +34,17 @@ public class HHeterSW {
             // Check if the split option is activated
             if (options.getSplitDatabase() != -1){
                 for(int rounds = options.getSplitDatabase() ; rounds > 0; rounds--){
+                    launchers = new ArrayList<>(); // Launchers are cleared between iterations
                     FastaSplitter.process(options.getDatabase(), algorithms.values()); // Split with percentages
                     prepareExecuteAndWaitLaunchers(algorithms, launchers); // Execute and obtain times
+                    showResults(launchers, System.out);
                     // Calculate new percentages
                     // First, we calculate the speed in pct/second
                     double sumSpeeds = 0.0;
                     double[] speeds = new double[launchers.size()];
                     Object[] algs = algorithms.values().toArray();
                     for(int i=0; i<algs.length; i++){
-                        speeds[i] = ((AlgorithmTuple)algs[i]).splitPercentage / (launchers.get(i).getTimeTaken()+0.1);
+                        speeds[i] = ((AlgorithmTuple)algs[i]).splitPercentage / (launchers.get(i).getTimeAlgorithm()); //.getTimeTaken());
                         sumSpeeds += speeds[i];
                     }
                     // The best time should be 100(speed_1+speed_2+speed_3...)
@@ -64,7 +66,7 @@ public class HHeterSW {
         }
     }
 
-    private static void prepareExecuteAndWaitLaunchers(HashMap<String, AlgorithmTuple> algorithms, List<Launcher> launchers) throws Exception {
+    protected static void prepareExecuteAndWaitLaunchers(HashMap<String, AlgorithmTuple> algorithms, List<Launcher> launchers) throws Exception {
         for(String key: algorithms.keySet()) {
             AlgorithmTuple lt = algorithms.get(key);
             Launcher launcher = (Launcher) lt.launcherClass.newInstance();
@@ -77,7 +79,7 @@ public class HHeterSW {
             l.join();
     }
 
-    private static HashMap<String, AlgorithmTuple> loadExecutions(Options options) throws Exception  {
+    protected static HashMap<String, AlgorithmTuple> loadExecutions(Options options) throws Exception  {
         Double totalPct = 0.0;
         HashMap<String, AlgorithmTuple> ret = new LinkedHashMap<>(); // This hash maintains the insertionn order
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new File("./executions.xml"));
@@ -132,7 +134,7 @@ public class HHeterSW {
         return ret;
     }    
 
-    private static void showResults(List<Launcher> launchers, PrintStream out) {
+    protected static void showResults(List<Launcher> launchers, PrintStream out) {
         out.println("Results:\n--------");
         Set<HitSet> result = new HashSet<>();
         launchers.stream().forEach((l) -> {

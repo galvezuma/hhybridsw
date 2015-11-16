@@ -38,11 +38,23 @@ public class SwipeProcessor extends Launcher {
             }
             // Elapsed:           13.97s
             if (lookingGCUPS && l.startsWith("Elapsed:")) {
-                double time = Double.parseDouble(l.substring(l.lastIndexOf("Elapsed:")+8, l.lastIndexOf("s")-1));
+                double time = 0.1;
+                try { 
+                    time = Double.parseDouble(l.substring(l.lastIndexOf("Elapsed:")+8, l.lastIndexOf("s")-1));
+                    if (time == 0.0) time = 0.1;
+                } catch (Exception x){
+                    time = 0.1;
+                }
                 // A new HitSet is created
                 l = in.readLine();
                 // Speed:             36.507 GCUPS
-                double gigaCUPS = Double.parseDouble(l.substring(l.lastIndexOf("Speed:")+6, l.lastIndexOf("GCUPS")-1));
+                double gigaCUPS = 0.1;
+                try {
+                    gigaCUPS = Double.parseDouble(l.substring(l.lastIndexOf("Speed:")+6, l.lastIndexOf("GCUPS")-1));
+                    if (Double.isNaN(gigaCUPS)) gigaCUPS = 0.1;
+                } catch (Exception x) {
+                    gigaCUPS = 0.1;
+                }
                 // A new HitSet is created
                 hs = new HitSet(name, gigaCUPS);
                 hs.setTime(time);

@@ -66,6 +66,9 @@ class Options {
     public String getInput(){
         return opt.get('i');
     }
+    public void setInput(String data){
+       opt.put('i', data);
+    }
     
     public String getMatrix(){
         return opt.get('m');
