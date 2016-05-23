@@ -33,7 +33,7 @@ public class FastaSplitter {
     private static enum Status {START, READING_PROTEIN, END}
     private static Status currentStatus = Status.START;
     //private static PriorityQueue<Protein> result = new PriorityQueue<>();
-    private static List<Protein> result = new ArrayList<>();
+    private static final List<Protein> result = new ArrayList<>();
     private static long numAminoAcids = 0;
     private static long totalLengthAminoAcids = 0;
     private static Protein currentProtein = null;
